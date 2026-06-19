@@ -155,14 +155,20 @@ public class AuthServiceImpl implements AuthService {
     }
     @Transactional
     @Override
-    public void logout(String refreshToken, String accessToken) {
+    public void logout(
+            String refreshToken,
+            String accessToken
+    ) {
 
-        RefreshToken token = refreshTokenService.validate(refreshToken);
+        RefreshToken token =
+                refreshTokenService.validate(refreshToken);
 
         blacklistService.blacklist(
                 accessToken,
                 jwtService.getExpirationMillis()
         );
+
+        userSessionService.deactivateSession(refreshToken);
 
         refreshTokenService.delete(token);
     }
