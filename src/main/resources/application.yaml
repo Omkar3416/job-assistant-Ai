@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: job-ai-assistant
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/job_ai_assistant
+    username: jobai_user
+    password: jobai123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
