@@ -111,21 +111,30 @@ public class AuthServiceImpl implements AuthService {
                 user.getId()
         );
 
-        refreshTokenService.deleteByUser(user);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        RefreshToken refreshToken = null;
 
-        userSessionService.createSession(
-                user,
-                refreshToken.getToken(),
-                device,
-                ip
-        );
+        if (request.isRememberMe()) {
+
+            refreshTokenService.deleteByUser(user);
+
+            refreshToken =
+                    refreshTokenService.createRefreshToken(user);
+
+            userSessionService.createSession(
+                    user,
+                    refreshToken.getToken(),
+                    device,
+                    ip
+            );
+        }
 
         AuthResponseDto response = new AuthResponseDto();
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getName().name());
         response.setToken(accessToken);
-        response.setRefreshToken(refreshToken.getToken());
+        if (refreshToken != null) {
+            response.setRefreshToken(refreshToken.getToken());
+        }
 
         return response;
     }
