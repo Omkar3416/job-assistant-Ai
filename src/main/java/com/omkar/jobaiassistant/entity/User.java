@@ -25,6 +25,9 @@ public class User {
 
     private LocalDateTime updatedAt;
 
+    private String provider;
+    private String providerId;
+
     public User() {
     }
 
@@ -69,6 +72,14 @@ public class User {
         return updatedAt;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -79,5 +90,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 }

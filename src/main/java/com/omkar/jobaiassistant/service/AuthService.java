@@ -10,4 +10,7 @@ public interface AuthService {
 
     AuthResponseDto refreshToken(String refreshToken);
 
-    void logout(String refreshToken, String accessToken);}
+    void logout(String refreshToken, String accessToken);
+
+    AuthResponseDto googleLogin(String idToken);
+}

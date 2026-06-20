@@ -62,4 +62,14 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponseDto> googleLogin(
+            @RequestBody GoogleLoginRequestDto request
+    ) {
+        return ResponseEntity.ok(
+                authService.googleLogin(
+                        request.getIdToken()
+                )
+        );
+    }
 }

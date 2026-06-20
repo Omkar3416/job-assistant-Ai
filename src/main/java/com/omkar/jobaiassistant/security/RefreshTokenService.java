@@ -19,15 +19,17 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshToken createRefreshToken(User user) {
+    public RefreshToken createRefreshToken(
+            User user,
+            int validityDays
+    ) {
 
-        // IMPORTANT FIX: always delete old token for same user
         refreshTokenRepository.deleteByUser(user);
 
         RefreshToken token = new RefreshToken(
                 UUID.randomUUID().toString(),
                 user,
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(validityDays)
         );
 
         return refreshTokenRepository.save(token);

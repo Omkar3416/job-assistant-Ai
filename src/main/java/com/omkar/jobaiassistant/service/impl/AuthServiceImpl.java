@@ -18,6 +18,7 @@ import com.omkar.jobaiassistant.service.AuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.omkar.jobaiassistant.security.GoogleTokenVerifierService;
 
 
 import java.util.UUID;
@@ -33,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService blacklistService;
     private final UserSessionService userSessionService;
+    private final GoogleTokenVerifierService googleTokenVerifierService;
 
     String sessionId = UUID.randomUUID().toString();
     String device = "UNKNOWN";
@@ -45,7 +47,8 @@ public class AuthServiceImpl implements AuthService {
             JwtService jwtService,
             RefreshTokenService refreshTokenService,
             TokenBlacklistService blacklistService,
-            UserSessionService userSessionService
+            UserSessionService userSessionService,
+            GoogleTokenVerifierService googleTokenVerifierService
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -54,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
         this.refreshTokenService = refreshTokenService;
         this.blacklistService = blacklistService;
         this.userSessionService = userSessionService;
+        this.googleTokenVerifierService = googleTokenVerifierService;
     }
 
     @Override
@@ -72,6 +76,9 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(userRole);
+
+        user.setProvider("LOCAL");
+        user.setProviderId(null);
 
         User savedUser = userRepository.save(user);
 
@@ -111,30 +118,31 @@ public class AuthServiceImpl implements AuthService {
                 user.getId()
         );
 
-        RefreshToken refreshToken = null;
+        int validityDays =
+                request.isRememberMe()
+                        ? 30
+                        : 7;
 
-        if (request.isRememberMe()) {
+        RefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(
+                        user,
+                        validityDays
+                );
 
-            refreshTokenService.deleteByUser(user);
-
-            refreshToken =
-                    refreshTokenService.createRefreshToken(user);
-
-            userSessionService.createSession(
-                    user,
-                    refreshToken.getToken(),
-                    device,
-                    ip
-            );
-        }
+        userSessionService.createSession(
+                user,
+                refreshToken.getToken(),
+                device,
+                ip
+        );
 
         AuthResponseDto response = new AuthResponseDto();
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getName().name());
         response.setToken(accessToken);
-        if (refreshToken != null) {
-            response.setRefreshToken(refreshToken.getToken());
-        }
+        response.setRefreshToken(
+                refreshToken.getToken()
+        );
 
         return response;
     }
@@ -181,4 +189,22 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenService.delete(token);
     }
+    @Override
+    public AuthResponseDto googleLogin(String idToken) {
+
+        var payload =
+                googleTokenVerifierService.verify(idToken);
+
+        String email = payload.getEmail();
+
+        AuthResponseDto response =
+                new AuthResponseDto();
+
+        response.setEmail(email);
+        response.setRole("USER");
+        response.setToken("GOOGLE_TOKEN_VERIFIED");
+
+        return response;
+    }
+
 }
