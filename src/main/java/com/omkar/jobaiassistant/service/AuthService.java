@@ -13,4 +13,6 @@ public interface AuthService {
     void logout(String refreshToken, String accessToken);
 
     AuthResponseDto googleLogin(String idToken);
+
+    CurrentUserDto getCurrentUser(String email);
 }

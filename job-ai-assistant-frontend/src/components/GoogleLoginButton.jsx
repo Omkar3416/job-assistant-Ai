@@ -30,7 +30,8 @@ function GoogleLoginButton() {
                 response.data.refreshToken
             );
 
-            alert("Login Successful");
+            window.location.href = "/dashboard";
+
         } catch (error) {
             console.error(error);
             alert("Login Failed");
@@ -40,6 +41,7 @@ function GoogleLoginButton() {
 
     return (
         <GoogleLogin
+            useOneTap
             onSuccess={handleSuccess}
             onError={() => {
                 alert("Google Login Failed");

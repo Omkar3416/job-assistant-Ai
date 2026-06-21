@@ -36,7 +36,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         // ✅ SKIP AUTH ENDPOINTS
-        if (path.startsWith("/api/auth")) {
+        if (
+                path.equals("/api/auth/login")
+                        || path.equals("/api/auth/register")
+                        || path.equals("/api/auth/google")
+                        || path.equals("/api/auth/refresh")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -67,25 +72,41 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             System.out.println(e);
         }
 
-        if (jwtService.isTokenValid(token)) {
+        System.out.println("TOKEN = " + token);
+
+        boolean valid =
+                jwtService.isTokenValid(token);
+
+        if (valid) {
 
             System.out.println("TOKEN VALID");
 
-            String email = jwtService.extractEmail(token);
-            String role = jwtService.extractRole(token);
+            String email =
+                    jwtService.extractEmail(token);
+
+            String role =
+                    jwtService.extractRole(token);
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            List.of(
+                                    new SimpleGrantedAuthority(
+                                            "ROLE_" + role
+                                    )
+                            )
                     );
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(auth);
 
-            System.out.println("AUTHENTICATION SET");
+            System.out.println(
+                    "AUTHENTICATION SET FOR " + email
+            );
+
         }
-
         filterChain.doFilter(request, response);
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.omkar.jobaiassistant.security.GoogleTokenVerifierService;
+import com.omkar.jobaiassistant.dto.CurrentUserDto;
 
 
 import java.util.UUID;
@@ -277,6 +278,35 @@ public class AuthServiceImpl implements AuthService {
         );
 
         return response;
+    }
+
+    @Override
+    public CurrentUserDto getCurrentUser(String email) {
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found")
+                );
+
+        CurrentUserDto dto =
+                new CurrentUserDto();
+
+        dto.setId(user.getId());
+
+        dto.setEmail(user.getEmail());
+
+        dto.setRole(
+                user.getRole()
+                        .getName()
+                        .name()
+        );
+
+        dto.setProvider(
+                user.getProvider()
+        );
+
+        return dto;
     }
 
 }

@@ -1,4 +1,5 @@
 package com.omkar.jobaiassistant.controller;
+import org.springframework.security.core.Authentication;
 
 import com.omkar.jobaiassistant.dto.*;
 import com.omkar.jobaiassistant.service.AuthService;
@@ -70,6 +71,18 @@ public class AuthController {
                 authService.googleLogin(
                         request.getIdToken()
                 )
+        );
+    }
+    @GetMapping("/me")
+    public ResponseEntity<CurrentUserDto> me(
+            Authentication authentication
+    ) {
+
+        String email =
+                authentication.getName();
+
+        return ResponseEntity.ok(
+                authService.getCurrentUser(email)
         );
     }
 }

@@ -32,7 +32,13 @@ public class SecurityConfig {
                 .cors(cors -> {})
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/google",
+                                "/api/auth/refresh"
+                        ).permitAll()
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated()
                 )

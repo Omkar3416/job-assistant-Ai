@@ -1,0 +1,38 @@
+.sidebar {
+    width: 260px;
+
+    padding: 25px;
+
+    border-right: 1px solid rgba(255,255,255,0.08);
+
+    background:
+            rgba(255,255,255,0.04);
+
+    backdrop-filter: blur(20px);
+}
+
+.logo {
+    margin-bottom: 40px;
+
+    font-size: 1.5rem;
+
+    font-weight: 700;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar nav a {
+    text-decoration: none;
+
+    color: white;
+
+    opacity: 0.8;
+}
+
+.sidebar nav a:hover {
+    opacity: 1;
+}
