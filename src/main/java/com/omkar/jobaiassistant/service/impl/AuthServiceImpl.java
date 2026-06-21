@@ -197,12 +197,84 @@ public class AuthServiceImpl implements AuthService {
 
         String email = payload.getEmail();
 
+        String googleUserId =
+                payload.getSubject();
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElse(null);
+
+        if (user == null) {
+
+            Role userRole = roleRepository
+                    .findByName(RoleName.USER)
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "USER role missing in database"
+                            )
+                    );
+
+            user = new User();
+
+            user.setEmail(email);
+
+            user.setPassword(
+                    passwordEncoder.encode(
+                            UUID.randomUUID().toString()
+                    )
+            );
+
+            user.setRole(userRole);
+
+            user.setProvider("GOOGLE");
+
+            user.setProviderId(
+                    googleUserId
+            );
+
+            user = userRepository.save(user);
+        }
+
+        String accessToken =
+                jwtService.generateToken(
+                        user.getEmail(),
+                        user.getRole().getName().name(),
+                        user.getId()
+                );
+
+        RefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(
+                        user,
+                        30
+                );
+
+        userSessionService.createSession(
+                user,
+                refreshToken.getToken(),
+                device,
+                ip
+        );
+
         AuthResponseDto response =
                 new AuthResponseDto();
 
-        response.setEmail(email);
-        response.setRole("USER");
-        response.setToken("GOOGLE_TOKEN_VERIFIED");
+        response.setEmail(
+                user.getEmail()
+        );
+
+        response.setRole(
+                user.getRole()
+                        .getName()
+                        .name()
+        );
+
+        response.setToken(
+                accessToken
+        );
+
+        response.setRefreshToken(
+                refreshToken.getToken()
+        );
 
         return response;
     }

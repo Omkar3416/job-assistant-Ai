@@ -18,6 +18,7 @@ public class GoogleTokenVerifierService {
     public GoogleIdToken.Payload verify(String idTokenString) {
 
         try {
+//            System.out.println("GOOGLE CLIENT ID = " + googleClientId);
 
             GoogleIdTokenVerifier verifier =
                     new GoogleIdTokenVerifier.Builder(
@@ -44,8 +45,11 @@ public class GoogleTokenVerifierService {
 
         } catch (Exception e) {
 
+            e.printStackTrace();
+
             throw new RuntimeException(
-                    "Google token verification failed"
+                    "Google token verification failed: "
+                            + e.getMessage()
             );
         }
     }

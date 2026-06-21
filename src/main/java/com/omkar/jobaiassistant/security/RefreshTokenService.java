@@ -24,11 +24,18 @@ public class RefreshTokenService {
             int validityDays
     ) {
 
-        refreshTokenRepository.deleteByUser(user);
+        RefreshToken token =
+                refreshTokenRepository
+                        .findByUser(user)
+                        .orElse(new RefreshToken());
 
-        RefreshToken token = new RefreshToken(
-                UUID.randomUUID().toString(),
-                user,
+        token.setUser(user);
+
+        token.setToken(
+                UUID.randomUUID().toString()
+        );
+
+        token.setExpiryDate(
                 LocalDateTime.now().plusDays(validityDays)
         );
 
