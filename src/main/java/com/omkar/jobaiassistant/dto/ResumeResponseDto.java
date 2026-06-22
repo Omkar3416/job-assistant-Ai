@@ -18,6 +18,8 @@ public class ResumeResponseDto {
 
     private String aiSummary;
 
+    private String storageMode;
+
     public ResumeResponseDto() {
     }
 
@@ -27,6 +29,10 @@ public class ResumeResponseDto {
 
     public String getAiSummary() {
         return aiSummary;
+    }
+
+    public String getStorageMode() {
+        return storageMode;
     }
 
     public Long getId() {
@@ -73,7 +79,12 @@ public class ResumeResponseDto {
         this.extractedText = extractedText;
     }
 
+    public void setStorageMode(String storageMode) {
+        this.storageMode = storageMode;
+    }
+
     public void setAiSummary(String aiSummary) {
         this.aiSummary = aiSummary;
     }
+
 }

@@ -6,9 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ResumeService {
 
     ResumeResponseDto uploadResume(
-            MultipartFile file
+            MultipartFile file,
+            String storageMode
     );
-
     ResumeResponseDto getResume(
             String email
     );

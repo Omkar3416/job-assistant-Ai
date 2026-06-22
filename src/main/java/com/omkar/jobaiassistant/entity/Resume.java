@@ -23,9 +23,12 @@ public class Resume {
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
 
+    private String storageMode;
+
     private LocalDateTime uploadedAt;
 
     private LocalDateTime updatedAt;
+
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,6 +41,10 @@ public class Resume {
     public void prePersist() {
         this.uploadedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getStorageMode() {
+        return storageMode;
     }
 
     @PreUpdate
@@ -103,5 +110,11 @@ public class Resume {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setStorageMode(
+            String storageMode
+    ) {
+        this.storageMode = storageMode;
     }
 }

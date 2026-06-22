@@ -1,5 +1,4 @@
 package com.omkar.jobaiassistant.service.impl;
-import com.omkar.jobaiassistant.service.AiResumeService;
 
 import com.omkar.jobaiassistant.config.FileStorageConfig;
 import com.omkar.jobaiassistant.dto.ResumeResponseDto;
@@ -8,6 +7,7 @@ import com.omkar.jobaiassistant.entity.User;
 import com.omkar.jobaiassistant.repository.ResumeRepository;
 import com.omkar.jobaiassistant.repository.UserRepository;
 import com.omkar.jobaiassistant.service.ResumeService;
+import com.omkar.jobaiassistant.service.AiResumeService;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -37,12 +37,14 @@ public class ResumeServiceImpl
     ) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
-        this.aiResumeService = aiResumeService;
+        this.aiResumeService =
+                aiResumeService;
     }
 
     @Override
     public ResumeResponseDto uploadResume(
-            MultipartFile file
+            MultipartFile file,
+            String storageMode
     ) {
 
         try {
@@ -51,6 +53,13 @@ public class ResumeServiceImpl
                     SecurityContextHolder
                             .getContext()
                             .getAuthentication();
+
+            if (auth == null) {
+
+                throw new RuntimeException(
+                        "User not authenticated"
+                );
+            }
 
             String email =
                     auth.getName();
@@ -97,18 +106,48 @@ public class ResumeServiceImpl
                             + filePath
             );
 
-            file.transferTo(destination);
 
-            String extractedText =
-                    extractPdfText(destination);
 
-            if (extractedText.length() > 15000) {
+            if (
+                    "SERVER".equals(
+                            storageMode
+                    )
+            )
+            {
+                file.transferTo(destination);
+            }
+
+            String extractedText;
+
+            if (
+                    "SERVER".equals(
+                            storageMode
+                    )
+            ) {
 
                 extractedText =
-                        extractedText.substring(
-                                0,
-                                15000
+                        extractPdfText(
+                                destination
                         );
+
+            } else {
+
+                File tempFile =
+                        File.createTempFile(
+                                "resume",
+                                ".pdf"
+                        );
+
+                file.transferTo(
+                        tempFile
+                );
+
+                extractedText =
+                        extractPdfText(
+                                tempFile
+                        );
+
+                tempFile.delete();
             }
 
             Resume existingResume =
@@ -116,10 +155,46 @@ public class ResumeServiceImpl
                             .findByUserId(user.getId())
                             .orElse(null);
 
+            if (
+                    existingResume != null
+                            &&
+                            existingResume.getFilePath()
+                                    != null
+            ) {
+
+                File oldFile =
+                        new File(
+                                existingResume
+                                        .getFilePath()
+                        );
+
+                if (oldFile.exists()) {
+
+                    oldFile.delete();
+                }
+            }
+
             Resume resume =
                     existingResume != null
                             ? existingResume
                             : new Resume();
+            resume.setFileName(
+                    file.getOriginalFilename()
+            );
+            resume.setFilePath(
+                    "SERVER".equals(
+                            storageMode
+                    )
+                            ? filePath
+                            : null
+            );
+
+            resume.setFileType(
+                    file.getContentType()
+            );
+            resume.setExtractedText(
+                    extractedText
+            );
 
             String aiSummary =
                     aiResumeService
@@ -131,23 +206,13 @@ public class ResumeServiceImpl
                     aiSummary
             );
 
-            resume.setFileName(
-                    file.getOriginalFilename()
-            );
-
-            resume.setFilePath(
-                    filePath
-            );
-
-            resume.setFileType(
-                    file.getContentType()
-            );
-
-            resume.setExtractedText(
-                    extractedText
+            resume.setStorageMode(
+                    storageMode
             );
 
             resume.setUser(user);
+
+
 
             Resume saved =
                     resumeRepository.save(resume);
@@ -177,6 +242,10 @@ public class ResumeServiceImpl
 
             response.setAiSummary(
                     saved.getAiSummary()
+            );
+
+            response.setStorageMode(
+                    saved.getStorageMode()
             );
 
             response.setMessage(
@@ -248,6 +317,10 @@ public class ResumeServiceImpl
                 resume.getAiSummary()
         );
 
+        response.setStorageMode(
+                resume.getStorageMode()
+        );
+
         response.setMessage(
                 "Resume fetched successfully"
         );
@@ -295,22 +368,21 @@ public class ResumeServiceImpl
 
         try {
 
-            File resumeFile =
-                    new File(
-                            resume.getFilePath()
-                    );
-
             if (
-                    resumeFile.exists()
+                    resume.getFilePath() != null
             ) {
 
-                boolean deleted =
-                        resumeFile.delete();
+                File resumeFile =
+                        new File(
+                                resume.getFilePath()
+                        );
 
-                System.out.println(
-                        "FILE DELETED = "
-                                + deleted
-                );
+                if (
+                        resumeFile.exists()
+                ) {
+
+                    resumeFile.delete();
+                }
             }
 
         } catch (Exception e) {
@@ -318,6 +390,8 @@ public class ResumeServiceImpl
             e.printStackTrace();
         }
 
-        resumeRepository.delete(resume);
+        resumeRepository.delete(
+                resume
+        );
     }
 }

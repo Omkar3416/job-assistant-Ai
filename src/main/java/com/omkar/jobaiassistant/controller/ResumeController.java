@@ -23,7 +23,13 @@ public class ResumeController {
     public ResponseEntity<ResumeResponseDto>
     uploadResume(
             @RequestParam("file")
-            MultipartFile file
+            MultipartFile file,
+
+            @RequestParam(
+                    value = "storageType",
+                    defaultValue = "SERVER"
+            )
+            String storageType
     ) {
 
         System.out.println(
@@ -46,7 +52,10 @@ public class ResumeController {
         );
 
         ResumeResponseDto response =
-                resumeService.uploadResume(file);
+                resumeService.uploadResume(
+                        file,
+                        storageType
+                );
 
         return ResponseEntity.ok(response);
     }
