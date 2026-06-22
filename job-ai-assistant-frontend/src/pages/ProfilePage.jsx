@@ -141,91 +141,125 @@ function ProfilePage() {
                     onSubmit={handleSubmit}
                 >
 
+                    <label>
+                        Full Name
+                    </label>
+
                     <input
                         type="text"
                         name="fullName"
                         value={formData.fullName}
-                        placeholder="Full Name"
+                        placeholder="Omkar Patil"
                         onChange={handleChange}
                     />
+
+                    <label>
+                        Phone Number
+                    </label>
 
                     <input
                         type="text"
                         name="phone"
                         value={formData.phone}
-                        placeholder="Phone"
+                        placeholder="9876543210"
                         onChange={handleChange}
                     />
+
+                    <label>
+                        Current Role
+                    </label>
 
                     <input
                         type="text"
                         name="currentRole"
                         value={formData.currentRole}
-                        placeholder="Current Role"
+                        placeholder="Software Engineer"
                         onChange={handleChange}
                     />
+
+                    <label>
+                        Preferred Roles
+                    </label>
 
                     <input
                         type="text"
                         name="preferredRoles"
                         value={formData.preferredRoles}
-                        placeholder="Preferred Roles"
+                        placeholder="Java Developer, Backend Developer"
                         onChange={handleChange}
                     />
+
+                    <label>
+                        Current City
+                    </label>
 
                     <input
                         type="text"
                         name="currentCity"
                         value={formData.currentCity}
-                        placeholder="Current City"
+                        placeholder="Pune"
                         onChange={handleChange}
                     />
+
+                    <label>
+                        Preferred Cities
+                    </label>
 
                     <input
                         type="text"
                         name="preferredCities"
                         value={formData.preferredCities}
-                        placeholder="Preferred Cities"
+                        placeholder="Pune, Mumbai, Bangalore"
                         onChange={handleChange}
                     />
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="remoteAllowed"
-                            checked={formData.remoteAllowed}
-                            onChange={handleChange}
-                        />
-                        Remote
-                    </label>
+                    <div className="work-mode-section">
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="hybridAllowed"
-                            checked={formData.hybridAllowed}
-                            onChange={handleChange}
-                        />
-                        Hybrid
-                    </label>
+                        <h3>
+                            Work Mode Preferences
+                        </h3>
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="officeAllowed"
-                            checked={formData.officeAllowed}
-                            onChange={handleChange}
-                        />
-                        Office
-                    </label>
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                name="remoteAllowed"
+                                checked={formData.remoteAllowed}
+                                onChange={handleChange}
+                            />
+                            Remote Jobs
+                        </label>
+
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                name="hybridAllowed"
+                                checked={formData.hybridAllowed}
+                                onChange={handleChange}
+                            />
+                            Hybrid Jobs
+                        </label>
+
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                name="officeAllowed"
+                                checked={formData.officeAllowed}
+                                onChange={handleChange}
+                            />
+                            Office Jobs
+                        </label>
+
+                    </div>
 
                     <button
                         type="submit"
                         disabled={saving}
                     >
-                        {saving
-                            ? "Saving..."
-                            : "Save Profile"}
+                        {
+                            saving
+                                ? "Saving..."
+                                : "Save Profile"
+                        }
                     </button>
 
                 </form>

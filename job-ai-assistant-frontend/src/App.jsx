@@ -4,11 +4,15 @@ import {
   Route
 } from "react-router-dom";
 
+import JobPreferencePage
+    from "./pages/JobPreferencePage";
+
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
 import { Navigate } from "react-router-dom";
+import ResumePage from "./pages/ResumePage";
 
 function App() {
   return (
@@ -38,6 +42,22 @@ function App() {
                 }
             />
             <Route
+                path="/job-preferences"
+                element={
+                    <ProtectedRoute>
+                        <JobPreferencePage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/resume"
+                element={
+                    <ProtectedRoute>
+                        <ResumePage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
                 path="/"
                 element={
                     localStorage.getItem("accessToken")
@@ -45,6 +65,7 @@ function App() {
                         : <LoginPage />
                 }
             />
+
 
         </Routes>
 

@@ -1,27 +1,28 @@
-.profile-container {
+.job-pref-container {
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
 }
 
-.profile-container h1 {
-    font-size: 42px;
+.job-pref-container h1 {
     margin-bottom: 30px;
+    font-size: 42px;
 }
 
-.profile-form {
+.job-pref-form {
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-.profile-form label {
+.job-pref-form label {
     font-size: 15px;
     font-weight: 600;
     color: #ffffff;
 }
 
-.profile-form input[type="text"] {
+.job-pref-form input[type="text"],
+.job-pref-form input[type="number"] {
     width: 100%;
     padding: 14px;
     border-radius: 10px;
@@ -32,7 +33,7 @@
     outline: none;
 }
 
-.profile-form input[type="text"]:focus {
+.job-pref-form input:focus {
     border-color: #4f8cff;
 }
 
@@ -44,18 +45,18 @@
 }
 
 .work-mode-section h3 {
-    font-size: 22px;
     margin-bottom: 10px;
+    font-size: 22px;
 }
 
-.checkbox-label {
+.work-mode-section label {
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
 }
 
-.profile-form button {
+.job-pref-form button {
     margin-top: 20px;
     padding: 14px;
     border: none;
@@ -67,11 +68,11 @@
 
 @media (max-width: 768px) {
 
-    .profile-container {
+    .job-pref-container {
         padding: 15px;
     }
 
-    .profile-container h1 {
+    .job-pref-container h1 {
         font-size: 32px;
     }
 }

@@ -17,6 +17,12 @@ function Sidebar() {
                 <a href="/profile">
                     Profile
                 </a>
+                <a href="/job-preferences">
+                    Job Preferences
+                </a>
+                <a href="/resume">
+                    Resume
+                </a>
 
                 <a href="#">
                     Applications

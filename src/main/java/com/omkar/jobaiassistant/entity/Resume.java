@@ -17,11 +17,9 @@ public class Resume {
 
     private String fileType;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String extractedText;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
 

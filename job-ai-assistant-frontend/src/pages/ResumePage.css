@@ -1,0 +1,70 @@
+.resume-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.resume-container h1 {
+    font-size: 42px;
+    margin-bottom: 30px;
+}
+
+.resume-card {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.resume-card p {
+    margin-bottom: 12px;
+}
+
+.resume-upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.resume-upload-section input[type="file"] {
+    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    background: #151515;
+}
+
+.resume-upload-section button {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.resume-preview {
+    margin-top: 25px;
+}
+
+.resume-preview textarea {
+    width: 100%;
+    min-height: 400px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #151515;
+    color: white;
+    resize: vertical;
+}
+
+@media (max-width: 768px) {
+
+    .resume-container {
+        padding: 15px;
+    }
+
+    .resume-container h1 {
+        font-size: 32px;
+    }
+}
