@@ -14,6 +14,9 @@ function ResumePage() {
     const [uploading, setUploading] =
         useState(false);
 
+    const [uploadStatus, setUploadStatus] =
+        useState("");
+
     useEffect(() => {
 
         loadResume();
@@ -58,6 +61,10 @@ function ResumePage() {
 
             setUploading(true);
 
+            setUploadStatus(
+                "Uploading resume and generating AI analysis. This may take 10-30 seconds..."
+            );
+
             const formData =
                 new FormData();
 
@@ -65,6 +72,10 @@ function ResumePage() {
                 "file",
                 file
             );
+
+            // setUploadStatus(
+            //     "Extracting Resume..."
+            // );
 
             const response =
                 await axiosClient.post(
@@ -78,11 +89,15 @@ function ResumePage() {
                     }
                 );
 
-            alert(
-                response.data.message
+            setUploadStatus(
+                "Generating AI Summary..."
             );
 
             loadResume();
+
+            setUploadStatus(
+                "Completed"
+            );
 
             setFile(null);
 
@@ -103,6 +118,45 @@ function ResumePage() {
         } finally {
 
             setUploading(false);
+            setTimeout(() => {
+
+                setUploadStatus("");
+
+            }, 2000);
+        }
+    };
+    const deleteResume = async () => {
+
+        const confirmed =
+            window.confirm(
+                "Delete current resume?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            await axiosClient.delete(
+                "/resume"
+            );
+
+            alert(
+                "Resume deleted successfully"
+            );
+
+            setResume(null);
+
+            setFile(null);
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Delete failed"
+            );
         }
     };
 
@@ -122,92 +176,158 @@ function ResumePage() {
 
             <div className="resume-container">
 
-                <h1>
-                    Resume Management
-                </h1>
+                <div className="resume-header">
 
-                {
-                    resume && (
-                        <div className="resume-card">
+                    <h1>Resume Management</h1>
 
-                            <h3>
-                                Current Resume
-                            </h3>
-
-                            <p>
-                                <strong>
-                                    File Name:
-                                </strong>{" "}
-                                {resume.fileName}
-                            </p>
-
-                            <p>
-                                <strong>
-                                    File Type:
-                                </strong>{" "}
-                                {resume.fileType}
-                            </p>
-
-                            <p>
-                                <strong>
-                                    Uploaded:
-                                </strong>{" "}
-                                {resume.uploadedAt}
-                            </p>
-
-                        </div>
-                    )
-                }
-
-                <div className="resume-upload-section">
-
-                    <label>
-                        Upload New Resume
-                    </label>
-
-                    <input
-                        type="file"
-                        accept=".pdf"
-                        onChange={(e) =>
-                            setFile(
-                                e.target.files[0]
-                            )
-                        }
-                    />
-
-                    <button
-                        onClick={uploadResume}
-                        disabled={uploading}
-                    >
-                        {
-                            uploading
-                                ? "Uploading..."
-                                : resume
-                                    ? "Update Resume"
-                                    : "Upload Resume"
-                        }
-                    </button>
+                    <p>
+                        Upload your resume and get
+                        AI powered analysis.
+                    </p>
 
                 </div>
 
                 {
-                    resume?.extractedText && (
-                        <div className="resume-preview">
+                    uploading && (
+                        <div className="upload-status-card">
 
                             <h3>
-                                Extracted Resume Content
+                                AI Processing Resume
                             </h3>
 
-                            <textarea
-                                readOnly
-                                value={
-                                    resume.extractedText
-                                }
-                            />
+                            <p>
+                                {uploadStatus}
+                            </p>
 
                         </div>
                     )
                 }
+
+                <div className="resume-grid">
+
+                    <div className="left-panel">
+
+                        {
+                            resume && (
+                                <div className="resume-card">
+
+                                    <h3>
+                                        Resume Overview
+                                    </h3>
+
+                                    <p>
+                                        <strong>
+                                            File:
+                                        </strong>{" "}
+                                        {resume.fileName}
+                                    </p>
+
+                                    <p>
+                                        <strong>
+                                            Type:
+                                        </strong>{" "}
+                                        {resume.fileType}
+                                    </p>
+
+                                    <p>
+                                        <strong>
+                                            Uploaded:
+                                        </strong>{" "}
+                                        {resume.uploadedAt}
+                                    </p>
+
+                                    <button
+                                        className="delete-btn"
+                                        onClick={deleteResume}
+                                    >
+                                        Delete Resume
+                                    </button>
+
+                                </div>
+                            )
+                        }
+
+                        <div className="resume-upload-section">
+
+                            <h3>
+                                Upload Resume
+                            </h3>
+
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={(e) =>
+                                    setFile(
+                                        e.target.files[0]
+                                    )
+                                }
+                            />
+
+                            <button
+                                onClick={uploadResume}
+                                disabled={uploading}
+                            >
+                                {
+                                    uploading
+                                        ? "Processing..."
+                                        : resume
+                                            ? "Update Resume"
+                                            : "Upload Resume"
+                                }
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div className="right-panel">
+
+                        {
+                            resume?.aiSummary && (
+                                <div className="resume-summary">
+
+                                    <h3>
+                                        AI Resume Analysis
+                                    </h3>
+
+                                    <div className="ai-summary-content">
+
+                                        <div className="summary-text">
+                                            {resume.aiSummary}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            )
+                        }
+
+                        {
+                            resume?.extractedText && (
+                                <div className="resume-preview">
+
+                                    <details>
+
+                                        <summary>
+                                            View Full Resume
+                                        </summary>
+
+                                        <textarea
+                                            readOnly
+                                            value={
+                                                resume.extractedText
+                                            }
+                                        />
+
+                                    </details>
+
+                                </div>
+                            )
+                        }
+
+                    </div>
+
+                </div>
 
             </div>
 

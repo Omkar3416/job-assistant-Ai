@@ -86,4 +86,21 @@ public class ResumeController {
 
         return ResponseEntity.ok(response);
     }
+    @DeleteMapping
+    public ResponseEntity<String>
+    deleteResume(
+            Authentication authentication
+    ) {
+
+        String email =
+                authentication.getName();
+
+        resumeService.deleteResume(
+                email
+        );
+
+        return ResponseEntity.ok(
+                "Resume deleted successfully"
+        );
+    }
 }

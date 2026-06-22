@@ -12,4 +12,8 @@ public interface ResumeService {
     ResumeResponseDto getResume(
             String email
     );
+
+    void deleteResume(
+            String email
+    );
 }

@@ -1,4 +1,5 @@
 package com.omkar.jobaiassistant.service.impl;
+import com.omkar.jobaiassistant.service.AiResumeService;
 
 import com.omkar.jobaiassistant.config.FileStorageConfig;
 import com.omkar.jobaiassistant.dto.ResumeResponseDto;
@@ -27,13 +28,16 @@ public class ResumeServiceImpl
     private final ResumeRepository resumeRepository;
 
     private final UserRepository userRepository;
+    private final AiResumeService aiResumeService;
 
     public ResumeServiceImpl(
             ResumeRepository resumeRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            AiResumeService aiResumeService
     ) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
+        this.aiResumeService = aiResumeService;
     }
 
     @Override
@@ -98,6 +102,15 @@ public class ResumeServiceImpl
             String extractedText =
                     extractPdfText(destination);
 
+            if (extractedText.length() > 15000) {
+
+                extractedText =
+                        extractedText.substring(
+                                0,
+                                15000
+                        );
+            }
+
             Resume existingResume =
                     resumeRepository
                             .findByUserId(user.getId())
@@ -107,6 +120,16 @@ public class ResumeServiceImpl
                     existingResume != null
                             ? existingResume
                             : new Resume();
+
+            String aiSummary =
+                    aiResumeService
+                            .generateResumeSummary(
+                                    extractedText
+                            );
+
+            resume.setAiSummary(
+                    aiSummary
+            );
 
             resume.setFileName(
                     file.getOriginalFilename()
@@ -246,5 +269,55 @@ public class ResumeServiceImpl
 
             return stripper.getText(document);
         }
+    }
+    @Override
+    public void deleteResume(
+            String email
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        Resume resume =
+                resumeRepository
+                        .findByUserId(user.getId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Resume not found"
+                                )
+                        );
+
+        try {
+
+            File resumeFile =
+                    new File(
+                            resume.getFilePath()
+                    );
+
+            if (
+                    resumeFile.exists()
+            ) {
+
+                boolean deleted =
+                        resumeFile.delete();
+
+                System.out.println(
+                        "FILE DELETED = "
+                                + deleted
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        resumeRepository.delete(resume);
     }
 }
