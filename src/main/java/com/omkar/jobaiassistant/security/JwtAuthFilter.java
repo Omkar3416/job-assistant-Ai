@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
-        System.out.println("AUTH HEADER = " + authHeader);
+//        System.out.println("AUTH HEADER = " + authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        System.out.println("TOKEN RECEIVED = " + token);
+//        System.out.println("TOKEN RECEIVED = " + token);
 
         if (token == null || token.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -72,14 +72,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             System.out.println(e);
         }
 
-        System.out.println("TOKEN = " + token);
+//        System.out.println("TOKEN = " + token);
 
         boolean valid =
                 jwtService.isTokenValid(token);
 
         if (valid) {
 
-            System.out.println("TOKEN VALID");
+//            System.out.println("TOKEN VALID");
 
             String email =
                     jwtService.extractEmail(token);
@@ -102,9 +102,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     .getContext()
                     .setAuthentication(auth);
 
-            System.out.println(
-                    "AUTHENTICATION SET FOR " + email
-            );
+//            System.out.println(
+//                    "AUTHENTICATION SET FOR " + email
+//            );
 
         }
         filterChain.doFilter(request, response);

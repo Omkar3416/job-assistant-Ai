@@ -41,3 +41,6 @@ jwt:
 google:
   client-id: ${GOOGLE_CLIENT_ID}
 
+automation:
+  encryption-key: ${AUTOMATION_ENCRYPTION_KEY}
+

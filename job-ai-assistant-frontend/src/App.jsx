@@ -6,6 +6,7 @@ import {
 
 import JobPreferencePage
     from "./pages/JobPreferencePage";
+import JobsPage from "./pages/JobsPage";
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -54,6 +55,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <ResumePage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/jobs"
+                element={
+                    <ProtectedRoute>
+                        <JobsPage />
                     </ProtectedRoute>
                 }
             />

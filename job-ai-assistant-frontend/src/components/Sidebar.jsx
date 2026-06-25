@@ -23,6 +23,9 @@ function Sidebar() {
                 <a href="/resume">
                     Resume
                 </a>
+                <a href="/jobs">
+                    Jobs
+                </a>
 
                 <a href="#">
                     Applications

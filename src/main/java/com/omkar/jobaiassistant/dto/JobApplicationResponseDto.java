@@ -16,6 +16,20 @@ public class JobApplicationResponseDto {
 
     private Double matchScore;
 
+    private String sourcePortal;
+
+    private Boolean autoApplied;
+
+    private Boolean manualApplyRequired;
+
+    private Integer attemptCount;
+
+    private String lastError;
+
+    private LocalDateTime queuedAt;
+
+    private LocalDateTime completedAt;
+
     private ApplicationStatus status;
 
     private LocalDateTime appliedAt;
@@ -43,6 +57,34 @@ public class JobApplicationResponseDto {
 
     public Double getMatchScore() {
         return matchScore;
+    }
+
+    public String getSourcePortal() {
+        return sourcePortal;
+    }
+
+    public Boolean getAutoApplied() {
+        return autoApplied;
+    }
+
+    public Boolean getManualApplyRequired() {
+        return manualApplyRequired;
+    }
+
+    public Integer getAttemptCount() {
+        return attemptCount;
+    }
+
+    public String getLastError() {
+        return lastError;
+    }
+
+    public LocalDateTime getQueuedAt() {
+        return queuedAt;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
     }
 
     public ApplicationStatus getStatus() {
@@ -75,6 +117,34 @@ public class JobApplicationResponseDto {
 
     public void setMatchScore(Double matchScore) {
         this.matchScore = matchScore;
+    }
+
+    public void setSourcePortal(String sourcePortal) {
+        this.sourcePortal = sourcePortal;
+    }
+
+    public void setAutoApplied(Boolean autoApplied) {
+        this.autoApplied = autoApplied;
+    }
+
+    public void setManualApplyRequired(Boolean manualApplyRequired) {
+        this.manualApplyRequired = manualApplyRequired;
+    }
+
+    public void setAttemptCount(Integer attemptCount) {
+        this.attemptCount = attemptCount;
+    }
+
+    public void setLastError(String lastError) {
+        this.lastError = lastError;
+    }
+
+    public void setQueuedAt(LocalDateTime queuedAt) {
+        this.queuedAt = queuedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 
     public void setStatus(ApplicationStatus status) {
