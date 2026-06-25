@@ -23,9 +23,10 @@ public class JobApplicationController {
         this.jobApplicationService = jobApplicationService;
     }
 
-    @PostMapping("/apply/{jobId}")
+//    @PostMapping("/apply/{jobId}")
+    @PostMapping("/queue/{jobId}")
     public ResponseEntity<JobApplicationResponseDto>
-    applyJob(
+    queueApplication(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
@@ -34,12 +35,29 @@ public class JobApplicationController {
                 authentication.getName();
 
         return ResponseEntity.ok(
-                jobApplicationService.applyJob(
+                jobApplicationService.queueApplication(
                         jobId,
                         email
                 )
         );
     }
+//    @PostMapping("/apply/{jobId}")
+//    public ResponseEntity<JobApplicationResponseDto>
+//    applyJob(
+//            @PathVariable Long jobId,
+//            Authentication authentication
+//    ) {
+//
+//        String email =
+//                authentication.getName();
+//
+//        return ResponseEntity.ok(
+//                jobApplicationService.applyJob(
+//                        jobId,
+//                        email
+//                )
+//        );
+//    }
 
     @GetMapping
     public ResponseEntity<List<JobApplicationResponseDto>>

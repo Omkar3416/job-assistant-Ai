@@ -31,6 +31,14 @@ public class Job {
 
     private String jobUrl;
 
+    private String sourcePortal;
+
+    private Boolean easyApply;
+
+    private Boolean externalApply;
+
+    private String externalJobId;
+
     private Boolean remoteAllowed;
 
     private Boolean active;
@@ -93,6 +101,22 @@ public class Job {
         return jobUrl;
     }
 
+    public String getSourcePortal() {
+        return sourcePortal;
+    }
+
+    public Boolean getEasyApply() {
+        return easyApply;
+    }
+
+    public Boolean getExternalApply() {
+        return externalApply;
+    }
+
+    public String getExternalJobId() {
+        return externalJobId;
+    }
+
     public Boolean getRemoteAllowed() {
         return remoteAllowed;
     }
@@ -139,6 +163,34 @@ public class Job {
 
     public void setJobUrl(String jobUrl) {
         this.jobUrl = jobUrl;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setSourcePortal(String sourcePortal) {
+        this.sourcePortal = sourcePortal;
+    }
+
+    public void setEasyApply(Boolean easyApply) {
+        this.easyApply = easyApply;
+    }
+
+    public void setExternalApply(Boolean externalApply) {
+        this.externalApply = externalApply;
+    }
+
+    public void setExternalJobId(String externalJobId) {
+        this.externalJobId = externalJobId;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public void setRemoteAllowed(Boolean remoteAllowed) {

@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import axiosClient from "../api/axiosClient";
 import { getMatchScore } from "../api/jobMatchApi";
-import "./JobsPage.css";
+import {
+    queueApplication,
+    getMyApplications
+} from "../api/jobApplicationApi";import "./JobsPage.css";
 
 function JobsPage() {
 
@@ -19,9 +22,14 @@ function JobsPage() {
     const [loadingJobId, setLoadingJobId] =
         useState(null);
 
+    const [appliedJobs, setAppliedJobs] =
+        useState([]);
+
     useEffect(() => {
 
         loadJobs();
+
+        loadApplications();
 
     }, []);
 
@@ -43,6 +51,26 @@ function JobsPage() {
         } finally {
 
             setLoading(false);
+        }
+    };
+    const loadApplications = async () => {
+
+        try {
+
+            const applications =
+                await getMyApplications();
+
+            const keys =
+                applications.map(
+                    app =>
+                        `${app.companyName}_${app.jobTitle}`
+                );
+
+            setAppliedJobs(keys);
+
+        } catch (error) {
+
+            console.error(error);
         }
     };
 
@@ -77,6 +105,38 @@ function JobsPage() {
         }
     };
 
+    const queueForApply = async (
+        jobId
+    ) => {
+
+        try {
+
+            setLoadingJobId(jobId);
+
+            const result =
+                await queueApplication(
+                    jobId
+                );
+            alert(
+                result.message
+            );
+
+            await loadApplications();
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to queue application"
+            );
+
+        } finally {
+
+            setLoadingJobId(null);
+        }
+    };
+
     if (loading) {
 
         return (
@@ -101,7 +161,14 @@ function JobsPage() {
             }
 
             {
-                jobs.map(job => (
+                jobs.map(job => {
+
+                    const alreadyApplied =
+                        appliedJobs.includes(
+                            `${job.companyName}_${job.title}`
+                        );
+
+                    return (
                     //
                     // <div
                     //     key={job.id}
@@ -163,18 +230,27 @@ function JobsPage() {
                         <button
                             className="match-btn"
                             onClick={() =>
-                                checkMatchScore(
+                                queueForApply(
                                     job.id
                                 )
                             }
                             disabled={
-                                loadingJobId === job.id
+                                loadingJobId === job.id ||
+                                alreadyApplied
                             }
+                            style={{
+                                background:
+                                    alreadyApplied
+                                        ? "#22c55e"
+                                        : undefined
+                            }}
                         >
                             {
-                                loadingJobId === job.id
-                                    ? "Calculating..."
-                                    : "AI Match Score"
+                                alreadyApplied
+                                    ? "✓ Already Applied"
+                                    : loadingJobId === job.id
+                                        ? "Applying..."
+                                        : "Apply With AI"
                             }
                         </button>
                         {
@@ -241,8 +317,7 @@ function JobsPage() {
 
                     </div>
 
-                ))
-            }
+                    )})}
 
 
 

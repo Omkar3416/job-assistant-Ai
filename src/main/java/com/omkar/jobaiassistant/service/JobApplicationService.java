@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface JobApplicationService {
 
-    JobApplicationResponseDto applyJob(
-            Long jobId,
-            String email
-    );
+//    JobApplicationResponseDto applyJob(
+//            Long jobId,
+//            String email
+//    );
 
     List<JobApplicationResponseDto> getMyApplications(
             String email
@@ -23,5 +23,10 @@ public interface JobApplicationService {
     JobApplicationResponseDto updateStatus(
             Long applicationId,
             ApplicationStatus status
+    );
+
+    JobApplicationResponseDto queueApplication(
+            Long jobId,
+            String email
     );
 }
