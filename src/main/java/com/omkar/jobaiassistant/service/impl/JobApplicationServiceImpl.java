@@ -11,6 +11,7 @@ import com.omkar.jobaiassistant.repository.UserRepository;
 import com.omkar.jobaiassistant.service.JobApplicationService;
 import org.springframework.stereotype.Service;
 import com.omkar.jobaiassistant.dto.JobDashboardResponseDto;
+import com.omkar.jobaiassistant.dto.UpdateApplicationStatusRequestDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +203,34 @@ public class JobApplicationServiceImpl
         );
 
         return response;
+    }
+
+    @Override
+    public JobApplicationResponseDto updateStatus(
+            Long applicationId,
+            ApplicationStatus status
+    ) {
+
+        JobApplication application =
+                jobApplicationRepository
+                        .findById(applicationId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Application not found"
+                                )
+                        );
+
+        application.setStatus(status);
+
+        JobApplication updated =
+                jobApplicationRepository.save(
+                        application
+                );
+
+        return map(
+                updated,
+                "Application status updated successfully"
+        );
     }
 
     private JobApplicationResponseDto map(

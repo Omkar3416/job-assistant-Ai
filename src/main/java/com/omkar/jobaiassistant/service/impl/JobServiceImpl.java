@@ -117,59 +117,106 @@ public class JobServiceImpl implements JobService {
 
             boolean matched = false;
 
+            String jobTitle =
+                    job.getTitle() == null
+                            ? ""
+                            : job.getTitle().toLowerCase();
+
+            String jobLocation =
+                    job.getLocation() == null
+                            ? ""
+                            : job.getLocation().toLowerCase();
+
             if (profile != null) {
 
-                if (profile.getPreferredRoles() != null &&
-                        job.getTitle() != null &&
-                        profile.getPreferredRoles()
-                                .toLowerCase()
-                                .contains(
-                                        job.getTitle().toLowerCase()
-                                )) {
+                if (profile.getPreferredRoles() != null) {
 
-                    matched = true;
+                    String[] roles =
+                            profile.getPreferredRoles()
+                                    .split(",");
+
+                    for (String role : roles) {
+
+                        if (jobTitle.contains(
+                                role.trim().toLowerCase()
+                        )) {
+
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
 
-                if (profile.getPreferredCities() != null &&
-                        job.getLocation() != null &&
-                        profile.getPreferredCities()
-                                .toLowerCase()
-                                .contains(
-                                        job.getLocation().toLowerCase()
-                                )) {
+                if (!matched &&
+                        profile.getPreferredCities() != null) {
 
-                    matched = true;
+                    String[] cities =
+                            profile.getPreferredCities()
+                                    .split(",");
+
+                    for (String city : cities) {
+
+                        if (jobLocation.contains(
+                                city.trim().toLowerCase()
+                        )) {
+
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
             }
 
             if (preference != null) {
 
-                if (preference.getPreferredRoles() != null &&
-                        job.getTitle() != null &&
-                        preference.getPreferredRoles()
-                                .toLowerCase()
-                                .contains(
-                                        job.getTitle().toLowerCase()
-                                )) {
+                if (!matched &&
+                        preference.getPreferredRoles() != null) {
 
-                    matched = true;
+                    String[] roles =
+                            preference.getPreferredRoles()
+                                    .split(",");
+
+                    for (String role : roles) {
+
+                        if (jobTitle.contains(
+                                role.trim().toLowerCase()
+                        )) {
+
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
 
-                if (preference.getPreferredLocations() != null &&
-                        job.getLocation() != null &&
-                        preference.getPreferredLocations()
-                                .toLowerCase()
-                                .contains(
-                                        job.getLocation().toLowerCase()
-                                )) {
+                if (!matched &&
+                        preference.getPreferredLocations() != null) {
 
-                    matched = true;
+                    String[] locations =
+                            preference.getPreferredLocations()
+                                    .split(",");
+
+                    for (String location : locations) {
+
+                        if (jobLocation.contains(
+                                location.trim().toLowerCase()
+                        )) {
+
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
             }
 
             if (matched) {
+
                 recommendedJobs.add(job);
             }
+        }
+
+        if (recommendedJobs.isEmpty()) {
+
+            recommendedJobs = allJobs;
         }
 
         return mapJobs(recommendedJobs);

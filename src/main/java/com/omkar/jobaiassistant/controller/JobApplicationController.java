@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.omkar.jobaiassistant.dto.JobDashboardResponseDto;
+import com.omkar.jobaiassistant.dto.UpdateApplicationStatusRequestDto;
+import com.omkar.jobaiassistant.entity.ApplicationStatus;
 
 import java.util.List;
 
@@ -66,6 +68,21 @@ public class JobApplicationController {
         return ResponseEntity.ok(
                 jobApplicationService.getDashboard(
                         email
+                )
+        );
+    }
+    @PutMapping("/{applicationId}/status")
+    public ResponseEntity<JobApplicationResponseDto>
+    updateStatus(
+            @PathVariable Long applicationId,
+            @RequestBody
+            UpdateApplicationStatusRequestDto request
+    ) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.updateStatus(
+                        applicationId,
+                        request.getStatus()
                 )
         );
     }
