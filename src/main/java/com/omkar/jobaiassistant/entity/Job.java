@@ -29,6 +29,7 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(unique = true)
     private String jobUrl;
 
     private String sourcePortal;

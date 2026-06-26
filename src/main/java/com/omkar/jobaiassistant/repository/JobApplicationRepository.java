@@ -17,4 +17,8 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             String companyName,
             String jobTitle
     );
+
+    List<JobApplication> findTop20ByStatusOrderByQueuedAtAsc(
+            ApplicationStatus status
+    );
 }

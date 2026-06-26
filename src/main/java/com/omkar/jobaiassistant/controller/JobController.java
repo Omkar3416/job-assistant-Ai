@@ -1,4 +1,5 @@
 package com.omkar.jobaiassistant.controller;
+import com.omkar.jobaiassistant.service.JobImportService;
 
 import com.omkar.jobaiassistant.dto.JobResponseDto;
 import com.omkar.jobaiassistant.service.JobService;
@@ -15,10 +16,15 @@ public class JobController {
 
     private final JobService jobService;
 
+    private final JobImportService jobImportService;
+
     public JobController(
-            JobService jobService
+            JobService jobService,
+            JobImportService jobImportService
     ) {
         this.jobService = jobService;
+        this.jobImportService =
+                jobImportService;
     }
 
     @GetMapping
@@ -95,6 +101,21 @@ public class JobController {
 
         return ResponseEntity.ok(
                 "Job deleted successfully"
+        );
+    }
+    @PostMapping("/import-naukri")
+    public ResponseEntity<String>
+    importNaukriJobs(
+            Authentication authentication
+    ) {
+
+        Integer count =
+                jobImportService.importNaukriJobs(
+                        authentication.getName()
+                );
+
+        return ResponseEntity.ok(
+                count + " jobs imported"
         );
     }
 }

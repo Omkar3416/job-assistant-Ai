@@ -21,4 +21,8 @@ public interface JobRepository
     List<Job> findByLocationContainingIgnoreCaseAndActiveTrue(
             String keyword
     );
+
+    boolean existsByJobUrl(
+            String jobUrl
+    );
 }
