@@ -8,6 +8,7 @@ import com.omkar.jobaiassistant.repository.ResumeRepository;
 import com.omkar.jobaiassistant.repository.UserRepository;
 import com.omkar.jobaiassistant.service.ResumeService;
 import com.omkar.jobaiassistant.service.AiResumeService;
+import com.omkar.jobaiassistant.service.AiSearchKeywordService;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -29,16 +30,20 @@ public class ResumeServiceImpl
 
     private final UserRepository userRepository;
     private final AiResumeService aiResumeService;
+    private final AiSearchKeywordService aiSearchKeywordService;
 
     public ResumeServiceImpl(
             ResumeRepository resumeRepository,
             UserRepository userRepository,
-            AiResumeService aiResumeService
+            AiResumeService aiResumeService,
+            AiSearchKeywordService aiSearchKeywordService
     ) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
         this.aiResumeService =
                 aiResumeService;
+        this.aiSearchKeywordService =
+                aiSearchKeywordService;
     }
 
     @Override
@@ -216,6 +221,10 @@ public class ResumeServiceImpl
 
             Resume saved =
                     resumeRepository.save(resume);
+
+            aiSearchKeywordService.refreshKeywords(
+                    user.getId()
+            );
 
             ResumeResponseDto response =
                     new ResumeResponseDto();

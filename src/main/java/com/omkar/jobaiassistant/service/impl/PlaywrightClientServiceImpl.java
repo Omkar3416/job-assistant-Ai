@@ -26,15 +26,25 @@ public class PlaywrightClientServiceImpl
 
     @Override
     public List<NaukriJobDto> searchJobs(
+
+
             String email,
             String password,
-            String keyword
-    ) {
+            List<String> keywords
+    )
+
+
+    {
+
+        System.out.println("==========================");
+        System.out.println("Playwright search called");
+        System.out.println("Keywords = " + keywords);
+        System.out.println("==========================");
 
         String url =
                 "http://localhost:3001/naukri/search-jobs";
 
-        Map<String, String> request =
+        Map<String, Object> request =
                 new HashMap<>();
 
         request.put(
@@ -48,8 +58,8 @@ public class PlaywrightClientServiceImpl
         );
 
         request.put(
-                "keyword",
-                keyword
+                "keywords",
+                keywords
         );
 
         HttpHeaders headers =
@@ -59,7 +69,7 @@ public class PlaywrightClientServiceImpl
                 MediaType.APPLICATION_JSON
         );
 
-        HttpEntity<Map<String, String>> entity =
+        HttpEntity<Map<String, Object>> entity =
                 new HttpEntity<>(
                         request,
                         headers
@@ -74,7 +84,10 @@ public class PlaywrightClientServiceImpl
                 );
 
         return response.getBody();
+
     }
+
+
     @Override
     public ApplyJobResultDto applyJob(
             String email,

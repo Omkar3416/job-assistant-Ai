@@ -8,6 +8,13 @@ public interface AiResumeService {
             String resumeText
     );
 
+    String generateSearchKeywords(
+            String resumeText,
+            String skills,
+            String preferredRoles,
+            String preferredLocations
+    );
+
     MatchScoreResponseDto calculateMatchScore(
             String resumeText,
             String jobDescription

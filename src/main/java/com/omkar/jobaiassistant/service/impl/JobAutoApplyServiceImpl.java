@@ -12,6 +12,7 @@ import com.omkar.jobaiassistant.security.CredentialEncryptionService;
 import com.omkar.jobaiassistant.service.PlaywrightClientService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -55,11 +56,35 @@ public class JobAutoApplyServiceImpl
 
         List<JobApplication> queue =
                 jobApplicationRepository
-                        .findTop20ByStatusOrderByQueuedAtAsc(
-                                ApplicationStatus.READY_TO_APPLY
+                        .findTop20ByStatusInOrderByQueuedAtAsc(
+                                Arrays.asList(
+                                        ApplicationStatus.READY_TO_APPLY,
+                                        ApplicationStatus.FAILED,
+                                        ApplicationStatus.QUOTA_WAITING
+                                )
                         );
 
         for (JobApplication application : queue) {
+
+            if (
+                    application.getAttemptCount() != null
+                            && application.getAttemptCount() >= 3
+            ) {
+
+                application.setStatus(
+                        ApplicationStatus.FAILED
+                );
+
+                application.setLastError(
+                        "Maximum retry limit reached."
+                );
+
+                jobApplicationRepository.save(
+                        application
+                );
+
+                continue;
+            }
 
             try {
 
@@ -141,26 +166,9 @@ public class JobAutoApplyServiceImpl
 
                 if (!result.isApplied()) {
 
-                    application.setStatus(
-                            ApplicationStatus.FAILED
-                    );
-
-                    application.setCompletedAt(
-                            LocalDateTime.now()
-                    );
-
-                    application.setLastError(
+                    markFailed(
+                            application,
                             result.getError()
-                    );
-
-                    application.setAttemptCount(
-                            application.getAttemptCount() == null
-                                    ? 1
-                                    : application.getAttemptCount() + 1
-                    );
-
-                    jobApplicationRepository.save(
-                            application
                     );
 
                     continue;
@@ -184,31 +192,39 @@ public class JobAutoApplyServiceImpl
 
             } catch (Exception ex) {
 
-                application.setStatus(
-                        ApplicationStatus.FAILED
-                );
-
-                application.setCompletedAt(
-                        LocalDateTime.now()
-                );
-
-                application.setLastError(
+                markFailed(
+                        application,
                         ex.getMessage()
-                );
-
-                application.setAttemptCount(
-                        application.getAttemptCount() == null
-                                ? 1
-                                : application.getAttemptCount() + 1
-
-                );
-
-
-
-                jobApplicationRepository.save(
-                        application
                 );
             }
         }
+    }
+
+    private void markFailed(
+            JobApplication application,
+            String error
+    ) {
+
+        application.setStatus(
+                ApplicationStatus.FAILED
+        );
+
+        application.setCompletedAt(
+                LocalDateTime.now()
+        );
+
+        application.setLastError(
+                error
+        );
+
+        application.setAttemptCount(
+                application.getAttemptCount() == null
+                        ? 1
+                        : application.getAttemptCount() + 1
+        );
+
+        jobApplicationRepository.save(
+                application
+        );
     }
 }

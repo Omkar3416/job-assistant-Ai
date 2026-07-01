@@ -1,5 +1,7 @@
 package com.omkar.jobaiassistant.service.impl;
 
+import com.omkar.jobaiassistant.service.AiSearchKeywordService;
+
 import com.omkar.jobaiassistant.dto.JobPreferenceRequestDto;
 import com.omkar.jobaiassistant.dto.JobPreferenceResponseDto;
 import com.omkar.jobaiassistant.entity.JobPreference;
@@ -19,12 +21,18 @@ public class JobPreferenceServiceImpl
 
     private final UserRepository userRepository;
 
+    private final AiSearchKeywordService
+            aiSearchKeywordService;
+
     public JobPreferenceServiceImpl(
             JobPreferenceRepository jobPreferenceRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            AiSearchKeywordService aiSearchKeywordService
     ) {
         this.jobPreferenceRepository = jobPreferenceRepository;
         this.userRepository = userRepository;
+        this.aiSearchKeywordService =
+                aiSearchKeywordService;
     }
 
     @Override
@@ -89,10 +97,29 @@ public class JobPreferenceServiceImpl
                 request.getMaxApplicationsPerCompany()
         );
 
+        preference.setAutoApplyEnabled(
+                request.getAutoApplyEnabled()
+        );
+
+        preference.setManualKeywords(
+                request.getManualSearchKeywords()
+        );
+
         preference.setUser(user);
 
         JobPreference saved =
                 jobPreferenceRepository.save(preference);
+
+
+
+        aiSearchKeywordService.refreshKeywords(
+                user.getId()
+        );
+
+        saved =
+                jobPreferenceRepository
+                        .findById(saved.getId())
+                        .orElse(saved);
 
         JobPreferenceResponseDto response =
                 new JobPreferenceResponseDto();
@@ -125,6 +152,14 @@ public class JobPreferenceServiceImpl
 
         response.setMaxApplicationsPerCompany(
                 saved.getMaxApplicationsPerCompany()
+        );
+
+        response.setAutoApplyEnabled(
+                preference.getAutoApplyEnabled()
+        );
+
+        response.setManualSearchKeywords(
+                saved.getManualKeywords()
         );
 
         response.setMessage(
@@ -191,6 +226,9 @@ public class JobPreferenceServiceImpl
 
         response.setMaxApplicationsPerCompany(
                 preference.getMaxApplicationsPerCompany()
+        );
+        response.setAutoApplyEnabled(
+                preference.getAutoApplyEnabled()
         );
 
         response.setMessage(

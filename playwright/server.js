@@ -10,6 +10,8 @@ const searchNaukriJobs =
 const applyNaukriJob =
     require("./services/applyNaukriJob");
 
+
+
 const app = express();
 
 app.use(cors());
@@ -36,13 +38,15 @@ app.post("/naukri/login", async (req, res) => {
 });
 
 app.post("/naukri/search-jobs", async (req, res) => {
+
+    console.log(">>>>>>>> SEARCH-JOBS API CALLED <<<<<<<<");
     try {
 
         const jobs =
             await searchNaukriJobs(
                 req.body.email,
                 req.body.password,
-                req.body.keyword
+                req.body.keywords
             );
 
         res.json(jobs);
@@ -83,6 +87,10 @@ app.post("/naukri/apply-job", async (req, res) => {
         });
     }
 });
+
+
+
+
 
 app.listen(3001, () => {
     console.log("Playwright running on 3001");

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import com.omkar.jobaiassistant.dto.JobDashboardResponseDto;
 import com.omkar.jobaiassistant.dto.UpdateApplicationStatusRequestDto;
 import com.omkar.jobaiassistant.entity.ApplicationStatus;
+import com.omkar.jobaiassistant.dto.JobMatchCheckRequestDto;
+import com.omkar.jobaiassistant.dto.JobMatchCheckResponseDto;
+import com.omkar.jobaiassistant.dto.ApplyResultRequestDto;
 
 import java.util.List;
 
@@ -22,42 +25,6 @@ public class JobApplicationController {
     ) {
         this.jobApplicationService = jobApplicationService;
     }
-
-//    @PostMapping("/apply/{jobId}")
-    @PostMapping("/queue/{jobId}")
-    public ResponseEntity<JobApplicationResponseDto>
-    queueApplication(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-
-        String email =
-                authentication.getName();
-
-        return ResponseEntity.ok(
-                jobApplicationService.queueApplication(
-                        jobId,
-                        email
-                )
-        );
-    }
-//    @PostMapping("/apply/{jobId}")
-//    public ResponseEntity<JobApplicationResponseDto>
-//    applyJob(
-//            @PathVariable Long jobId,
-//            Authentication authentication
-//    ) {
-//
-//        String email =
-//                authentication.getName();
-//
-//        return ResponseEntity.ok(
-//                jobApplicationService.applyJob(
-//                        jobId,
-//                        email
-//                )
-//        );
-//    }
 
     @GetMapping
     public ResponseEntity<List<JobApplicationResponseDto>>
@@ -104,4 +71,27 @@ public class JobApplicationController {
                 )
         );
     }
+    @PostMapping("/can-apply")
+    public ResponseEntity<JobMatchCheckResponseDto> canApply(
+            @RequestBody
+            JobMatchCheckRequestDto request
+    ) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.canApply(request)
+        );
+
+    }
+    @PostMapping("/apply-result")
+    public ResponseEntity<Void> applyResult(
+            @RequestBody
+            ApplyResultRequestDto request
+    ) {
+
+        jobApplicationService.applyResult(request);
+
+        return ResponseEntity.ok().build();
+
+    }
+
 }

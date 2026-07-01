@@ -31,3 +31,17 @@ build/
 .env
 ### VS Code ###
 .vscode/
+
+
+# macOS
+.DS_Store
+
+# Node modules
+playwright/node_modules/
+
+# Playwright browser profile
+playwright/profile/
+
+# Debug screenshots
+playwright/*.png
+

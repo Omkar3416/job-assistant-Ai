@@ -16,6 +16,10 @@ public class JobPreferenceRequestDto {
 
     private Integer maxApplicationsPerCompany;
 
+    private Boolean autoApplyEnabled;
+
+    private String manualSearchKeywords;
+
     public JobPreferenceRequestDto() {
     }
 
@@ -69,6 +73,25 @@ public class JobPreferenceRequestDto {
 
     public Integer getMaxApplicationsPerCompany() {
         return maxApplicationsPerCompany;
+    }
+
+    public Boolean getAutoApplyEnabled() {
+        return autoApplyEnabled;
+    }
+
+    public String getManualSearchKeywords() {
+        return manualSearchKeywords;
+    }
+
+    public void setManualSearchKeywords(
+            String manualSearchKeywords
+    ) {
+        this.manualSearchKeywords =
+                manualSearchKeywords;
+    }
+
+    public void setAutoApplyEnabled(Boolean autoApplyEnabled) {
+        this.autoApplyEnabled = autoApplyEnabled;
     }
 
     public void setMaxApplicationsPerCompany(Integer maxApplicationsPerCompany) {

@@ -1,106 +1,216 @@
-const { chromium } = require("playwright");
+const {
+    getPage
+} = require("./browserManager");
+
+const MAX_PAGES = 1;
 
 async function searchNaukriJobs(
+
     email,
     password,
-    keyword
+    keywords
 ) {
 
-    const browser =
-        await chromium.launch({
-            headless: false
-        });
+    console.log("INSIDE searchNaukriJobs()");
 
     const page =
-        await browser.newPage();
-
-    try {
-
-        await page.goto(
-            "https://www.naukri.com/",
-            {
-                waitUntil: "domcontentloaded"
-            }
-        );
-
-        await page.click(
-            'a[title="Jobseeker Login"]'
-        );
-
-        await page.waitForSelector(
-            'input[placeholder="Enter your active Email ID / Username"]'
-        );
-
-        await page.fill(
-            'input[placeholder="Enter your active Email ID / Username"]',
-            email
-        );
-
-        await page.fill(
-            'input[placeholder="Enter your password"]',
+        await getPage(
+            email,
             password
         );
 
-        await page.click(
-            'button[type="submit"]'
-        );
+    try {
 
-        await page.waitForTimeout(
-            5000
-        );
+        const allJobs = [];
+
+        const visitedUrls = new Set();
+
+        for (const keyword of keywords) {
+
+         try{
+             const formattedKeyword =
+                 keyword
+                     .trim()
+                     .toLowerCase()
+                     .replace(/\s+/g, "-");
+
+
+
+             console.log(
+                 "SEARCH KEYWORD:",
+                 formattedKeyword
+             );
+
+             for (
+                 let pageNumber = 1;
+                 pageNumber <= MAX_PAGES;
+                 pageNumber++
+             ) {
+
+                 const url =
+                     pageNumber === 1
+                         ? `https://www.naukri.com/${formattedKeyword}-jobs`
+                         : `https://www.naukri.com/${formattedKeyword}-jobs-${pageNumber}`;
+
+                 console.log(
+                     "Opening:",
+                     url
+                 );
+
+                 await page.goto(
+                     url,
+                     {
+                         waitUntil: "domcontentloaded",
+                         timeout: 60000
+                     }
+                 );
+
+                 await page.waitForTimeout(2500);
+
+                 const bodyText = await page.locator("body").innerText();
+
+                 if (
+                     bodyText.includes("We'll be back soon") ||
+                     bodyText.includes("upgrading our systems")
+                 ) {
+                     throw new Error(
+                         "Naukri is currently under maintenance. Try again later."
+                     );
+                 }
+                 try {
+
+                     await page.waitForSelector(
+                         ".srp-jobtuple-wrapper",
+                         {
+                             timeout: 15000
+                         }
+                     );
+                     const html = await page.$eval(
+                         ".srp-jobtuple-wrapper",
+                         e => e.outerHTML
+                     );
+
+                     console.log(html);
+
+                 } catch (e) {
+
+                     console.log("No job cards found.");
+
+                     break;
+
+                 }
+                 const jobs =
+                     await page.$$eval(
+                         ".srp-jobtuple-wrapper",
+                         cards =>
+                             cards.map(card => ({
+
+                                 title:
+                                     card.querySelector(".title")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 company:
+                                     card.querySelector(".comp-name")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 location:
+                                     card.querySelector(".locWdth")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 experience:
+                                     card.querySelector(".expwdth")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 salary:
+                                     card.querySelector(".sal-wrap")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 description:
+                                     card.querySelector(".job-desc")
+                                         ?.innerText
+                                         ?.trim() || "",
+
+                                 url:
+                                     card.querySelector(".title")
+                                         ?.href || "",
+
+                                 easyApply:
+                                     card.innerText
+                                         .toLowerCase()
+                                         .includes("easy apply"),
+
+                                 externalApply:
+                                     card.innerText
+                                         .toLowerCase()
+                                         .includes("apply on company site")
+
+                             }))
+                     );
+
+                 if (jobs.length === 0) {
+
+                     console.log(
+                         `No jobs found on page ${pageNumber}`
+                     );
+
+                     break;
+                 }
+
+                 console.log(
+                     `Found ${jobs.length} jobs on page ${pageNumber}`
+                 );
+
+                 for (const job of jobs) {
+
+                     if (
+                         !job.url ||
+                         visitedUrls.has(job.url)
+                     ) {
+
+                         continue;
+
+                     }
+
+                     visitedUrls.add(
+                         job.url
+                     );
+
+                     allJobs.push(
+                         job
+                     );
+
+                 }
+             }
+         }catch (e){
+
+             console.log(
+                 `Skipping keyword ${keyword}`
+             );
+
+             console.log(
+                 `Navigation failed for keyword: ${keyword}`
+             );
+
+             console.log(e.message);
+
+             continue;
+
+         }
+        }
 
         console.log(
-            "Logged into Naukri"
+            `Total unique jobs collected: ${allJobs.length}`
         );
 
-        const formattedKeyword =
-            keyword
-                .trim()
-                .toLowerCase()
-                .replace(/\s+/g, "-");
-
-        console.log(
-            "SEARCH KEYWORD:",
-            formattedKeyword
-        );
-
-        await page.goto(
-            `https://www.naukri.com/${formattedKeyword}-jobs`,
-            {
-                waitUntil: "domcontentloaded"
-            }
-        );
-
-        await page.waitForTimeout(
-            3000
-        );
-
-        const jobs =
-            await page.$$eval(
-                ".srp-jobtuple-wrapper",
-                cards =>
-                    cards.map(card => ({
-                        title:
-                            card.querySelector(".title")
-                                ?.innerText || "",
-
-                        company:
-                            card.querySelector(".comp-name")
-                                ?.innerText || "",
-
-                        url:
-                            card.querySelector(".title")
-                                ?.href || ""
-                    }))
-            );
-
-        await browser.close();
-
-        return jobs;
+        return allJobs;
 
     } catch (error) {
 
-        await browser.close();
 
         throw error;
     }

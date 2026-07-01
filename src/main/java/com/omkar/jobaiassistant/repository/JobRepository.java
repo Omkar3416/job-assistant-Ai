@@ -22,7 +22,16 @@ public interface JobRepository
             String keyword
     );
 
-    boolean existsByJobUrl(
+    boolean existsByUserIdAndJobUrl(
+            Long userId,
             String jobUrl
+    );
+
+    List<Job> findByUserIdAndActiveTrue(
+            Long userId
+    );
+
+    List<Job> findByUserIdAndActiveTrueOrderByCreatedAtDesc(
+            Long userId
     );
 }

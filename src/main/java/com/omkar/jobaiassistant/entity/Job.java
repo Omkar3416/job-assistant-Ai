@@ -29,7 +29,7 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(unique = true)
+    @Column
     private String jobUrl;
 
     private String sourcePortal;
@@ -43,6 +43,13 @@ public class Job {
     private Boolean remoteAllowed;
 
     private Boolean active;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false
+    )
+    private User user;
 
     private LocalDateTime createdAt;
 
@@ -126,6 +133,10 @@ public class Job {
         return active;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -200,5 +211,9 @@ public class Job {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

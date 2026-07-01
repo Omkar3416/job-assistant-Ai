@@ -1,10 +1,42 @@
 package com.omkar.jobaiassistant.dto;
 
+import java.util.List;
+
 public class MatchScoreResponseDto {
 
     private Integer score;
 
     private String analysis;
+
+    private Boolean skillMatched;
+
+    private java.util.List<String> matchedSkills;
+
+    private java.util.List<String> missingSkills;
+
+    public Boolean getSkillMatched() {
+        return skillMatched;
+    }
+
+    public void setSkillMatched(Boolean skillMatched) {
+        this.skillMatched = skillMatched;
+    }
+
+    public List<String> getMatchedSkills() {
+        return matchedSkills;
+    }
+
+    public void setMatchedSkills(List<String> matchedSkills) {
+        this.matchedSkills = matchedSkills;
+    }
+
+    public List<String> getMissingSkills() {
+        return missingSkills;
+    }
+
+    public void setMissingSkills(List<String> missingSkills) {
+        this.missingSkills = missingSkills;
+    }
 
     public MatchScoreResponseDto() {
     }

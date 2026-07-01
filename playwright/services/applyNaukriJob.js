@@ -1,4 +1,13 @@
-const { chromium } = require("playwright");
+const {
+    getPage
+} = require("./browserManager");
+
+const {
+    detectApplicationStatus
+} = require("./applicationStatus");
+
+const completeEasyApply =
+    require("./completeEasyApply");
 
 async function applyNaukriJob(
     email,
@@ -6,97 +15,102 @@ async function applyNaukriJob(
     jobUrl
 ) {
 
-    const browser =
-        await chromium.launch({
-            headless: false
-        });
+    const searchPage =
+        await getPage(
+            email,
+            password
+        );
 
-    const page =
-        await browser.newPage();
+    const jobPage =
+        await searchPage.context().newPage();
+
+    await jobPage.bringToFront();
 
     try {
 
-        await page.goto(
-            "https://www.naukri.com/nlogin/login",
+
+        await jobPage.goto(
+            jobUrl,
             {
-                waitUntil: "domcontentloaded"
+                waitUntil: "domcontentloaded",
+                timeout: 60000
             }
         );
 
-        await page.waitForSelector(
-            'input[placeholder="Enter Email ID /Username"], input[placeholder="Enter Email ID / Username"]',
-            {
-                timeout:30000
-            }
-        );
+        await jobPage.waitForTimeout(3000);
+
 
         console.log(
-            await page.locator("input").evaluateAll(
-                els =>
-                    els.map(e => ({
-                        type: e.type,
-                        name: e.name,
-                        placeholder: e.placeholder
-                    }))
-            )
+            "Current Job URL:",
+            await jobPage.url()
         );
-        console.log("Current URL:", await page.url());
+        // await page.goto(
+        //     "https://www.naukri.com/nlogin/login",
+        //     {
+        //         waitUntil: "domcontentloaded"
+        //     }
+        // );
+        //
+        // await page.waitForSelector(
+        //     'input[placeholder="Enter Email ID /Username"], input[placeholder="Enter Email ID / Username"]',
+        //     {
+        //         timeout:30000
+        //     }
+        // );
+        //
+        // console.log(
+        //     await page.locator("input").evaluateAll(
+        //         els =>
+        //             els.map(e => ({
+        //                 type: e.type,
+        //                 name: e.name,
+        //                 placeholder: e.placeholder
+        //             }))
+        //     )
+        // );
+        // console.log("Current URL:", await page.url());
+        //
+        // await page.screenshot({
+        //     path: "01-after-goto.png",
+        //     fullPage: true
+        // });
+        //
+        // await page
+        //     .getByPlaceholder("Enter Email ID / Username")
+        //     .fill(email);
+        //
+        // await page.screenshot({
+        //     path: `debug-${Date.now()}.png`,
+        //     fullPage: true
+        // });
+        //
+        // console.log(await page.url());
+        // console.log(await page.content());
+        // await page.locator('input[type="password"]').fill(password);
+        //
+        // await page.click('button[type="submit"]');
+        //
+        // await page.waitForTimeout(8000);
+        //
+        // console.log("After Login URL:", page.url());
 
-        await page.screenshot({
-            path: "01-after-goto.png",
-            fullPage: true
-        });
 
-        await page
-            .getByPlaceholder("Enter Email ID / Username")
-            .fill(email);
 
-        await page.screenshot({
-            path: `debug-${Date.now()}.png`,
-            fullPage: true
-        });
 
-        console.log(await page.url());
-        console.log(await page.content());
-        await page.locator('input[type="password"]').fill(password);
-
-        await page.click('button[type="submit"]');
-
-        await page.waitForTimeout(8000);
-
-        console.log("After Login URL:", page.url());
-
-        await page.screenshot({
+        await jobPage.screenshot({
             path: "02-after-login.png",
             fullPage: true
         });
 
-        if (page.url().includes("/nlogin/login")) {
+        if (jobPage.url().includes("/nlogin/login")) {
             throw new Error("Login failed.");
         }
 
 
-        await page.waitForTimeout(
-            5000
-        );
 
-        await page.screenshot({
-            path: "02-after-login.png",
-            fullPage: true
-        });
-
-        console.log("After Login URL:", await page.url());
-
-        await page.goto(jobUrl,{
-            waitUntil:"domcontentloaded"
-        });
-
-        await page.waitForTimeout(5000);
-
-        console.log("Current Job URL:", page.url());
 
         console.log(
-            await page.locator("button").evaluateAll(btns =>
+            await jobPage.locator("button").evaluateAll(btns =>
                 btns.map(b => ({
                     text: b.innerText.trim(),
                     id: b.id,
@@ -109,7 +123,7 @@ async function applyNaukriJob(
 // Easy Apply
 // --------------------------------------------------
 
-        const easyApply = page.locator("#apply-button");
+        const easyApply = jobPage.locator("#apply-button");
 
         if (await easyApply.count() > 0) {
 
@@ -119,21 +133,22 @@ async function applyNaukriJob(
 
             await easyApply.first().click();
 
-            await page.waitForTimeout(3000);
+            await jobPage.waitForTimeout(2000);
 
-            return {
-                applied: true,
-                externalApply: false,
-                quotaReached: false,
-                error: null
-            };
+            // ----------------------------------
+// Complete Easy Apply form
+// ----------------------------------
+
+            await completeEasyApply(jobPage);
+
+            return await detectApplicationStatus(jobPage);
         }
 
 // --------------------------------------------------
 // Apply Button (text)
 // --------------------------------------------------
 
-        const applyButton = page.getByRole("button", {
+        const applyButton = jobPage.getByRole("button", {
             name: /^Apply$/i
         });
 
@@ -145,21 +160,18 @@ async function applyNaukriJob(
 
             await applyButton.first().click();
 
-            await page.waitForTimeout(3000);
+            await jobPage.waitForTimeout(3000);
 
-            return {
-                applied: true,
-                externalApply: false,
-                quotaReached: false,
-                error: null
-            };
+            await completeEasyApply(jobPage);
+
+            return await detectApplicationStatus(jobPage);
         }
 
 // --------------------------------------------------
 // Apply on company site
 // --------------------------------------------------
 
-        const companyApply = page.getByRole("button", {
+        const companyApply = jobPage.getByRole("button", {
             name: /Apply on company site/i
         });
 
@@ -198,8 +210,27 @@ async function applyNaukriJob(
 
     } finally {
 
-        // await browser.close();
+        try {
+
+            if (!jobPage.isClosed()) {
+
+                await jobPage.close();
+
+            }
+
+        } catch (e) {
+
+            console.log(
+                "Unable to close job tab:",
+                e.message
+            );
+
+        }
+
     }
 }
 
+
+
 module.exports = applyNaukriJob;
+
